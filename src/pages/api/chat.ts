@@ -20,10 +20,12 @@ const handleRequest = async ({
   prompt,
   userId,
   supabaseAuthedClient,
+  type
 }: {
   prompt: string;
   userId: string;
   supabaseAuthedClient: SupabaseClient;
+  type:string;
 }) => {
   try {
     const channel = supabaseAuthedClient.channel(userId);
@@ -40,6 +42,8 @@ const handleRequest = async ({
     const conversationHistory = await conversationLog.getConversation({
       limit: 10,
     });
+    
+    
     await conversationLog.addEntry({ entry: prompt, speaker: "user" });
 
     // Build an LLM chain that will improve the user prompt
@@ -67,13 +71,18 @@ const handleRequest = async ({
           },
         });
 
+        var urls;
+        var docs = [];
+
+        if(type != 'generateQuestions'){
+
         const matches = await getMatchesFromEmbeddings(
           inquiry,
           supabaseAuthedClient,
           2
         );
 
-        const urls =
+         urls =
           matches &&
           Array.from(
             new Set(
@@ -87,7 +96,7 @@ const handleRequest = async ({
 
         console.log(urls);
 
-        const docs =
+         docs =
           matches &&
           Array.from(
             matches.reduce((map, match) => {
@@ -100,15 +109,30 @@ const handleRequest = async ({
             }, new Map())
           ).map(([_, text]) => text);
 
-        const promptTemplate = new PromptTemplate({
-          template: templates.qaTemplate,
-          inputVariables: [
-            "summaries",
-            "question",
-            "conversationHistory",
-            "urls",
-          ],
-        });
+        }
+        
+          // Checking if the type of request is to generate assesments
+        var promptTemplate = null;
+        if(type == 'generateQuestions'){
+          promptTemplate = new PromptTemplate({
+            template: templates.generateAssessmentTemplate,
+            inputVariables: [
+              "userPrompt",
+            ],
+          });
+        }
+        else {
+          promptTemplate = new PromptTemplate({
+            template: templates.qaTemplate,
+            inputVariables: [
+              "summaries",
+              "question",
+              "conversationHistory",
+              "urls",
+            ],
+          });
+        }
+
 
         let i = 0;
         const chat = new ChatOpenAI({
@@ -150,7 +174,8 @@ const handleRequest = async ({
           prompt: promptTemplate,
           llm: chat,
         });
-
+        
+        if(type != 'generateQuestions'){
         const allDocs = docs.join("\n");
         if (allDocs.length > 4000) {
           await channel.send({
@@ -174,6 +199,12 @@ const handleRequest = async ({
           conversationHistory,
           urls,
         });
+      }
+      else {
+        await chain.call({
+          userPrompt: inquiry
+        })
+      }
       }
     });
   } catch (error) {
@@ -214,10 +245,12 @@ export default async function handler(
   // Run queries with RLS on the server
   const { body } = req;
   const { prompt } = body;
+  const { type } = body
   await handleRequest({
     prompt,
     userId: session.user.id,
     supabaseAuthedClient: supabase,
+    type:type
   });
   res.status(200).json({ message: "started" });
 }

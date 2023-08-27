@@ -17,6 +17,7 @@
     "@supabase/supabase-js": "^2.24.0",
     "bottleneck": "^2.19.5",
     "cheerio": "^1.0.0-rc.12",
+    "google-auth-library": "^8.9.0",
     "langchain": "^0.0.96",
     "next": "13.1.6",
     "node-spider": "^1.4.1",
@@ -38,6 +39,7 @@
     "@types/url-parse": "^1.4.8",
     "eslint": "8.34.0",
     "eslint-config-next": "13.1.6",
+    "supabase": "^1.88.0",
     "typescript": "4.9.5"
   }
 }

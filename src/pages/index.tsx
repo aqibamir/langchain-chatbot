@@ -64,6 +64,7 @@ export default function Home() {
   const [botIsTyping, setBotIsTyping] = useState(false);
   const [statusMessage, setStatusMessage] = useState("Waiting for query...");
   const [userId, setUserId] = useState<string | undefined>();
+  const [requestType, setRequestType] = useState("normal"); // Step 1
 
   useEffect(() => {
     supabaseBrowserClient.auth.getSession().then(({ data: { session } }) => {
@@ -120,7 +121,7 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ prompt: text }),
+        body: JSON.stringify({ prompt: text, type: requestType }),
       });
 
       await response.json();
@@ -145,7 +146,18 @@ export default function Home() {
           <MainContainer>
             <ChatContainer>
               <ConversationHeader>
-                <ConversationHeader.Actions></ConversationHeader.Actions>
+                <ConversationHeader.Actions>
+                <p>Generate Questions</p>
+                <input
+                    type="checkbox"
+                    checked={requestType === "generateQuestions"}
+                    onChange={() =>
+                      setRequestType(
+                        requestType === "generateQuestions" ? "normal" : "generateQuestions"
+                      )
+                    }
+                  />
+                </ConversationHeader.Actions>
                 <ConversationHeader.Content
                   userName="Langchain Supa GPT"
                   info={statusMessage}

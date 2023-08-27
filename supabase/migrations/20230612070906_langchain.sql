@@ -10,13 +10,6 @@ create table documents (
 );
 -- Set up Row Level Security (RLS)
 -- See https://supabase.com/docs/guides/auth/row-level-security for more details.
-alter table documents
-  enable row level security;
-  
-CREATE POLICY "Allow langchain querying for authenticated users" ON "public"."documents"
-AS PERMISSIVE FOR SELECT
-TO authenticated
-USING (true);
 
 -- Create a function to search for documents
 create function match_documents (

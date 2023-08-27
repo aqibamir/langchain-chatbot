@@ -3,55 +3,13 @@ export type Json =
   | number
   | boolean
   | null
-  | { [key: string]: Json }
+  | { [key: string]: Json | undefined }
   | Json[]
 
 export interface Database {
   public: {
     Tables: {
-      conversations: {
-        Row: {
-          created_at: string
-          entry: string | null
-          id: string
-          speaker: Database["public"]["Enums"]["speaker"]
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          entry?: string | null
-          id?: string
-          speaker: Database["public"]["Enums"]["speaker"]
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          entry?: string | null
-          id?: string
-          speaker?: Database["public"]["Enums"]["speaker"]
-          user_id?: string
-        }
-      }
-      documents: {
-        Row: {
-          content: string | null
-          embedding: unknown | null
-          id: number
-          metadata: Json | null
-        }
-        Insert: {
-          content?: string | null
-          embedding?: unknown | null
-          id?: number
-          metadata?: Json | null
-        }
-        Update: {
-          content?: string | null
-          embedding?: unknown | null
-          id?: number
-          metadata?: Json | null
-        }
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
@@ -65,7 +23,7 @@ export interface Database {
       }
       match_documents: {
         Args: {
-          query_embedding: unknown
+          query_embedding: string
           match_count?: number
           filter?: Json
         }
@@ -80,29 +38,29 @@ export interface Database {
         Args: {
           "": number[]
         }
-        Returns: unknown
+        Returns: string
       }
       vector_dims: {
         Args: {
-          "": unknown
+          "": string
         }
         Returns: number
       }
       vector_norm: {
         Args: {
-          "": unknown
+          "": string
         }
         Returns: number
       }
       vector_out: {
         Args: {
-          "": unknown
+          "": string
         }
         Returns: unknown
       }
       vector_send: {
         Args: {
-          "": unknown
+          "": string
         }
         Returns: string
       }

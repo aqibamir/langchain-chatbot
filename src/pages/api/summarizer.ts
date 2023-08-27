@@ -4,6 +4,7 @@ import { LLMChain } from "langchain/chains";
 import { PromptTemplate } from "langchain/prompts";
 import Bottleneck from "bottleneck";
 import { StructuredOutputParser } from "langchain/output_parsers";
+import { GoogleVertexAI } from "langchain/llms/googlevertexai";
 
 const llm = new OpenAI({
   concurrency: 10,
